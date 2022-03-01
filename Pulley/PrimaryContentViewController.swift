@@ -74,7 +74,6 @@ extension PrimaryContentViewController: PulleyPrimaryContentControllerDelegate {
         // on the PulleyViewController. This was causing issues with the drawer scroll view in 2.8.2+, see fix
         // for issue #400 and update 2.8.5
         guard drawer.currentDisplayMode == .drawer else {
-            
             temperatureLabelBottomConstraint.constant = temperatureLabelBottomDistance
             return
         }

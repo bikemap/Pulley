@@ -995,10 +995,9 @@ open class PulleyViewController: UIViewController, PulleyDrawerViewControllerDel
                 xOrigin = (panelCornerPlacement == .bottomLeft || panelCornerPlacement == .topLeft) ? (safeAreaLeftInset + panelInsets.left) : (self.view.bounds.maxX - (safeAreaRightInset + panelInsets.right) - panelWidth)
                 
                 yOrigin = (panelCornerPlacement == .bottomLeft || panelCornerPlacement == .bottomRight) ? (panelInsets.top + safeAreaTopInset) : (panelInsets.top + safeAreaTopInset + bounceOverflowMargin)
-                
             }
-            
-            if supportedPositions.contains(.open) || supportedPositions.contains(.partiallyRevealed)
+
+            if displayModeForCurrentLayout == .compact || supportedPositions.contains(.open)
             {
                 // Layout scrollview
                 drawerScrollView.frame = CGRect(x: xOrigin, y: yOrigin, width: width, height: heightOfOpenDrawer)
