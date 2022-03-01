@@ -90,12 +90,6 @@ public typealias PulleyAnimationCompletionBlock = ((_ finished: Bool) -> Void)
         .closed
     ]
     
-    public static let compact: [PulleyPosition] = [
-        .collapsed,
-        .open,
-        .closed
-    ]
-    
     public let rawValue: Int
     
     public init(rawValue: Int) {
@@ -641,13 +635,7 @@ open class PulleyViewController: UIViewController, PulleyDrawerViewControllerDel
     /// The drawer positions supported by the drawer
     fileprivate var supportedPositions: [PulleyPosition] = PulleyPosition.all {
         didSet {
-            
             guard self.isViewLoaded else {
-                return
-            }
-            
-            guard supportedPositions.count > 0 else {
-                supportedPositions = self.currentDisplayMode == .compact ? PulleyPosition.compact : PulleyPosition.all
                 return
             }
             
@@ -1010,7 +998,7 @@ open class PulleyViewController: UIViewController, PulleyDrawerViewControllerDel
                 
             }
             
-            if supportedPositions.contains(.open)
+            if supportedPositions.contains(.open) || supportedPositions.contains(.partiallyRevealed)
             {
                 // Layout scrollview
                 drawerScrollView.frame = CGRect(x: xOrigin, y: yOrigin, width: width, height: heightOfOpenDrawer)
@@ -1509,17 +1497,14 @@ open class PulleyViewController: UIViewController, PulleyDrawerViewControllerDel
      */
     public func setNeedsSupportedDrawerPositionsUpdate()
     {
-        if let drawerVCCompliant = drawerContentViewController as? PulleyDrawerViewControllerDelegate
+        if let drawerVCCompliant = drawerContentViewController as? PulleyDrawerViewControllerDelegate,
+            let setSupportedDrawerPositions = drawerVCCompliant.supportedDrawerPositions?()
         {
-            if let setSupportedDrawerPositions = drawerVCCompliant.supportedDrawerPositions?() {
-                supportedPositions = self.currentDisplayMode == .compact ? setSupportedDrawerPositions.filter(PulleyPosition.compact.contains) : setSupportedDrawerPositions
-            } else {
-                supportedPositions = self.currentDisplayMode == .compact ?  PulleyPosition.compact : PulleyPosition.all
-            }
+            supportedPositions = setSupportedDrawerPositions
         }
         else
         {
-            supportedPositions = self.currentDisplayMode == .compact ?  PulleyPosition.compact : PulleyPosition.all
+            supportedPositions = self.currentDisplayMode == .compact ?  [PulleyPosition.collapsed, .open] : PulleyPosition.all
         }
     }
     
@@ -1540,7 +1525,6 @@ open class PulleyViewController: UIViewController, PulleyDrawerViewControllerDel
     
     override open var childForStatusBarStyle: UIViewController? {
         get {
-            
             if drawerPosition == .open {
                 return drawerContentViewController
             }
@@ -1599,9 +1583,9 @@ open class PulleyViewController: UIViewController, PulleyDrawerViewControllerDel
     open func supportedDrawerPositions() -> [PulleyPosition] {
         if let drawerVCCompliant = drawerContentViewController as? PulleyDrawerViewControllerDelegate,
             let supportedPositions = drawerVCCompliant.supportedDrawerPositions?() {
-            return (self.currentDisplayMode == .compact ? supportedPositions.filter(PulleyPosition.compact.contains) : supportedPositions)
+            return supportedPositions
         } else {
-            return (self.currentDisplayMode == .compact ? PulleyPosition.compact : PulleyPosition.all)
+            return (self.currentDisplayMode == .compact ? [PulleyPosition.open, .collapsed] : PulleyPosition.all)
         }
     }
     
