@@ -1181,6 +1181,14 @@ open class PulleyViewController: UIViewController, PulleyDrawerViewControllerDel
             (feedbackGenerator as? UINotificationFeedbackGenerator)?.notificationOccurred(.success)
         }
     }
+
+    public func hideDrawer() {
+      drawerScrollView.isHidden = true
+    }
+
+    public func showDrawer() {
+      drawerScrollView.isHidden = false
+    }
     
     /// Add a gesture recognizer to the drawer scrollview
     ///
