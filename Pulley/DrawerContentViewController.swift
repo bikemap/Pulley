@@ -120,7 +120,7 @@ extension DrawerContentViewController: PulleyDrawerViewControllerDelegate {
         // Handle tableview scrolling / searchbar editing
         
         tableView.isScrollEnabled = drawer.drawerPosition == .open || drawer.currentDisplayMode == .panel
-        
+
         if drawer.drawerPosition != .open
         {
             searchBar.resignFirstResponder()

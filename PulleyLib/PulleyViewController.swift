@@ -884,15 +884,15 @@ open class PulleyViewController: UIViewController, PulleyDrawerViewControllerDel
         
         var automaticDisplayMode: PulleyDisplayMode = .drawer
         if (self.view.bounds.width >= 600.0 ) {
-            switch self.traitCollection.horizontalSizeClass {
+            switch self.traitCollection.verticalSizeClass {
             case .compact:
                 automaticDisplayMode = .compact
             default:
-                automaticDisplayMode = .panel
+                automaticDisplayMode = .drawer
             }
         }
         
-        let displayModeForCurrentLayout: PulleyDisplayMode = displayMode != .automatic ? displayMode : automaticDisplayMode
+        let displayModeForCurrentLayout: PulleyDisplayMode = self.displayMode == .automatic ? automaticDisplayMode : self.displayMode
         
         currentDisplayMode = displayModeForCurrentLayout
         

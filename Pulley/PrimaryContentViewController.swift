@@ -38,9 +38,6 @@ class PrimaryContentViewController: UIViewController {
         // Customize Pulley in viewWillAppear, as the view controller's viewDidLoad will run *before* Pulley's and some changes may be overwritten.
         // Uncomment if you want to change the visual effect style to dark. Note: The rest of the sample app's UI isn't made for dark theme. This just shows you how to do it.
         // drawer.drawerBackgroundVisualEffectView = UIVisualEffectView(effect: UIBlurEffect(style: .dark))
-
-        // We want the 'side panel' layout in landscape iPhone / iPad, so we set this to 'automatic'. The default is 'bottomDrawer' for compatibility with older Pulley versions.
-        self.pulleyViewController?.displayMode = .automatic
     }
     
     @IBAction func runPrimaryContentTransitionWithoutAnimation(sender: AnyObject) {
