@@ -32,6 +32,11 @@ import UIKit
      *  Called when the current drawer display mode changes (leftSide vs bottomDrawer). Make UI changes to account for this here.
      */
     @objc optional func drawerDisplayModeDidChange(drawer: PulleyViewController)
+  
+    /**
+     *  Called when setDrawerPosition animation finishes.
+     */
+    @objc optional func drawerPositionChangeDidFinish(drawer: PulleyViewController, finished: Bool)
 }
 
 /**
@@ -1730,7 +1735,9 @@ extension PulleyViewController: UIScrollViewDelegate {
                 
             case .nearestPosition:
                 
-                setDrawerPosition(position: closestValidDrawerPosition, animated: true)
+                setDrawerPosition(position: closestValidDrawerPosition, animated: true) { finished in
+                  self.delegate?.drawerPositionChangeDidFinish?(drawer: self, finished: finished)
+                }
                 
             case .nearestPositionUnlessExceeded(let threshold):
                 
@@ -1768,7 +1775,9 @@ extension PulleyViewController: UIScrollViewDelegate {
                     }
                 }
                 
-                setDrawerPosition(position: positionToSnapTo, animated: true)
+                setDrawerPosition(position: positionToSnapTo, animated: true) { finished in
+                  self.delegate?.drawerPositionChangeDidFinish?(drawer: self, finished: finished)
+                }
             }
         }
     }
