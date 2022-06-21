@@ -290,6 +290,7 @@ open class PulleyViewController: UIViewController, PulleyDrawerViewControllerDel
             addChild(controller)
 
             drawerContentContainer.addSubview(controller.view)
+            drawerContentContainer.translatesAutoresizingMaskIntoConstraints = false
             
             controller.view.constrainToParent()
             
