@@ -32,6 +32,11 @@ import UIKit
      *  Called when the current drawer display mode changes (leftSide vs bottomDrawer). Make UI changes to account for this here.
      */
     @objc optional func drawerDisplayModeDidChange(drawer: PulleyViewController)
+  
+    /**
+     *  Called when setDrawerPosition animation finishes.
+     */
+    @objc optional func drawerPositionChangeDidFinish(drawer: PulleyViewController, finished: Bool)
 }
 
 /**
@@ -86,12 +91,6 @@ public typealias PulleyAnimationCompletionBlock = ((_ finished: Bool) -> Void)
     public static let all: [PulleyPosition] = [
         .collapsed,
         .partiallyRevealed,
-        .open,
-        .closed
-    ]
-    
-    public static let compact: [PulleyPosition] = [
-        .collapsed,
         .open,
         .closed
     ]
@@ -641,13 +640,7 @@ open class PulleyViewController: UIViewController, PulleyDrawerViewControllerDel
     /// The drawer positions supported by the drawer
     fileprivate var supportedPositions: [PulleyPosition] = PulleyPosition.all {
         didSet {
-            
             guard self.isViewLoaded else {
-                return
-            }
-            
-            guard supportedPositions.count > 0 else {
-                supportedPositions = self.currentDisplayMode == .compact ? PulleyPosition.compact : PulleyPosition.all
                 return
             }
             
@@ -896,15 +889,15 @@ open class PulleyViewController: UIViewController, PulleyDrawerViewControllerDel
         
         var automaticDisplayMode: PulleyDisplayMode = .drawer
         if (self.view.bounds.width >= 600.0 ) {
-            switch self.traitCollection.horizontalSizeClass {
+            switch self.traitCollection.verticalSizeClass {
             case .compact:
                 automaticDisplayMode = .compact
             default:
-                automaticDisplayMode = .panel
+                automaticDisplayMode = .drawer
             }
         }
         
-        let displayModeForCurrentLayout: PulleyDisplayMode = displayMode != .automatic ? displayMode : automaticDisplayMode
+        let displayModeForCurrentLayout: PulleyDisplayMode = self.displayMode == .automatic ? automaticDisplayMode : self.displayMode
         
         currentDisplayMode = displayModeForCurrentLayout
         
@@ -1007,10 +1000,9 @@ open class PulleyViewController: UIViewController, PulleyDrawerViewControllerDel
                 xOrigin = (panelCornerPlacement == .bottomLeft || panelCornerPlacement == .topLeft) ? (safeAreaLeftInset + panelInsets.left) : (self.view.bounds.maxX - (safeAreaRightInset + panelInsets.right) - panelWidth)
                 
                 yOrigin = (panelCornerPlacement == .bottomLeft || panelCornerPlacement == .bottomRight) ? (panelInsets.top + safeAreaTopInset) : (panelInsets.top + safeAreaTopInset + bounceOverflowMargin)
-                
             }
-            
-            if supportedPositions.contains(.open)
+
+            if displayModeForCurrentLayout == .compact || supportedPositions.contains(.open)
             {
                 // Layout scrollview
                 drawerScrollView.frame = CGRect(x: xOrigin, y: yOrigin, width: width, height: heightOfOpenDrawer)
@@ -1193,6 +1185,14 @@ open class PulleyViewController: UIViewController, PulleyDrawerViewControllerDel
             (feedbackGenerator as? UISelectionFeedbackGenerator)?.selectionChanged()
             (feedbackGenerator as? UINotificationFeedbackGenerator)?.notificationOccurred(.success)
         }
+    }
+
+    public func hideDrawer() {
+      drawerScrollView.isHidden = true
+    }
+
+    public func showDrawer() {
+      drawerScrollView.isHidden = false
     }
     
     /// Add a gesture recognizer to the drawer scrollview
@@ -1509,17 +1509,14 @@ open class PulleyViewController: UIViewController, PulleyDrawerViewControllerDel
      */
     public func setNeedsSupportedDrawerPositionsUpdate()
     {
-        if let drawerVCCompliant = drawerContentViewController as? PulleyDrawerViewControllerDelegate
+        if let drawerVCCompliant = drawerContentViewController as? PulleyDrawerViewControllerDelegate,
+            let setSupportedDrawerPositions = drawerVCCompliant.supportedDrawerPositions?()
         {
-            if let setSupportedDrawerPositions = drawerVCCompliant.supportedDrawerPositions?() {
-                supportedPositions = self.currentDisplayMode == .compact ? setSupportedDrawerPositions.filter(PulleyPosition.compact.contains) : setSupportedDrawerPositions
-            } else {
-                supportedPositions = self.currentDisplayMode == .compact ?  PulleyPosition.compact : PulleyPosition.all
-            }
+            supportedPositions = setSupportedDrawerPositions
         }
         else
         {
-            supportedPositions = self.currentDisplayMode == .compact ?  PulleyPosition.compact : PulleyPosition.all
+            supportedPositions = self.currentDisplayMode == .compact ?  [PulleyPosition.collapsed, .open] : PulleyPosition.all
         }
     }
     
@@ -1540,7 +1537,6 @@ open class PulleyViewController: UIViewController, PulleyDrawerViewControllerDel
     
     override open var childForStatusBarStyle: UIViewController? {
         get {
-            
             if drawerPosition == .open {
                 return drawerContentViewController
             }
@@ -1599,9 +1595,9 @@ open class PulleyViewController: UIViewController, PulleyDrawerViewControllerDel
     open func supportedDrawerPositions() -> [PulleyPosition] {
         if let drawerVCCompliant = drawerContentViewController as? PulleyDrawerViewControllerDelegate,
             let supportedPositions = drawerVCCompliant.supportedDrawerPositions?() {
-            return (self.currentDisplayMode == .compact ? supportedPositions.filter(PulleyPosition.compact.contains) : supportedPositions)
+            return supportedPositions
         } else {
-            return (self.currentDisplayMode == .compact ? PulleyPosition.compact : PulleyPosition.all)
+            return (self.currentDisplayMode == .compact ? [PulleyPosition.open, .collapsed] : PulleyPosition.all)
         }
     }
     
@@ -1739,7 +1735,9 @@ extension PulleyViewController: UIScrollViewDelegate {
                 
             case .nearestPosition:
                 
-                setDrawerPosition(position: closestValidDrawerPosition, animated: true)
+                setDrawerPosition(position: closestValidDrawerPosition, animated: true) { finished in
+                  self.delegate?.drawerPositionChangeDidFinish?(drawer: self, finished: finished)
+                }
                 
             case .nearestPositionUnlessExceeded(let threshold):
                 
@@ -1777,7 +1775,9 @@ extension PulleyViewController: UIScrollViewDelegate {
                     }
                 }
                 
-                setDrawerPosition(position: positionToSnapTo, animated: true)
+                setDrawerPosition(position: positionToSnapTo, animated: true) { finished in
+                  self.delegate?.drawerPositionChangeDidFinish?(drawer: self, finished: finished)
+                }
             }
         }
     }

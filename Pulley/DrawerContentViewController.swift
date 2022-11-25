@@ -89,11 +89,11 @@ extension DrawerContentViewController: PulleyDrawerViewControllerDelegate {
     func partialRevealDrawerHeight(bottomSafeArea: CGFloat) -> CGFloat
     {
         // For devices with a bottom safe area, we want to make our drawer taller. Your implementation may not want to do that. In that case, disregard the bottomSafeArea value.
-        return 264.0 + (pulleyViewController?.currentDisplayMode == .drawer ? bottomSafeArea : 0.0)
+        return 164.0 + (pulleyViewController?.currentDisplayMode == .drawer ? bottomSafeArea : 0.0)
     }
     
     func supportedDrawerPositions() -> [PulleyPosition] {
-        return PulleyPosition.all // You can specify the drawer positions you support. This is the same as: [.open, .partiallyRevealed, .collapsed, .closed]
+        return [.collapsed, .partiallyRevealed] // You can specify the drawer positions you support. This is the same as: [.open, .partiallyRevealed, .collapsed, .closed]
     }
     
     // This function is called by Pulley anytime the size, drawer position, etc. changes. It's best to customize your VC UI based on the bottomSafeArea here (if needed). Note: You might also find the `pulleySafeAreaInsets` property on Pulley useful to get Pulley's current safe area insets in a backwards compatible (with iOS < 11) way. If you need this information for use in your layout, you can also access it directly by using `drawerDistanceFromBottom` at any time.
@@ -120,7 +120,7 @@ extension DrawerContentViewController: PulleyDrawerViewControllerDelegate {
         // Handle tableview scrolling / searchbar editing
         
         tableView.isScrollEnabled = drawer.drawerPosition == .open || drawer.currentDisplayMode == .panel
-        
+
         if drawer.drawerPosition != .open
         {
             searchBar.resignFirstResponder()

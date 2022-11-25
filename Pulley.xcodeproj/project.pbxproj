@@ -173,9 +173,9 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 355DBF1C1E40EA4300671CDD /* Build configuration list for PBXNativeTarget "Pulley" */;
 			buildPhases = (
+				355DBF101E40EA4300671CDD /* Headers */,
 				355DBF0E1E40EA4300671CDD /* Sources */,
 				355DBF0F1E40EA4300671CDD /* Frameworks */,
-				355DBF101E40EA4300671CDD /* Headers */,
 				355DBF111E40EA4300671CDD /* Resources */,
 			);
 			buildRules = (
@@ -213,7 +213,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 0730;
-				LastUpgradeCheck = 1200;
+				LastUpgradeCheck = 1320;
 				ORGANIZATIONNAME = 52inc;
 				TargetAttributes = {
 					355DBF121E40EA4300671CDD = {
