@@ -1050,7 +1050,6 @@ open class PulleyViewController: UIViewController, PulleyDrawerViewControllerDel
         (primaryContentViewController as? PulleyPrimaryContentControllerDelegate)?.drawerChangedDistanceFromBottom?(drawer: self, distance: drawerScrollView.contentOffset.y + lowestStop, bottomSafeArea: pulleySafeAreaInsets.bottom)
         
         maskDrawerVisualEffectView()
-        maskBackgroundDimmingView()
         
         // Do not need to set the the drawer position in layoutSubview if the position of the drawer is changing
         // and the view is being layed out. If the drawer position is changing and the view is layed out (i.e.
